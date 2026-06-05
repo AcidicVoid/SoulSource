@@ -1,6 +1,5 @@
 ﻿using FlaxEngine;
 using Game.Physics;
-using Gasimo.CineBlend;
 using Quaternion = FlaxEngine.Quaternion;
 using Vector3 = FlaxEngine.Vector3;
 
@@ -66,7 +65,7 @@ public class FpsController : Script
     private Quaternion _orientationAtLastJump = Quaternion.Zero;
     
     // Internals
-    private VirtualCamera _camera;
+    private Camera        _camera;
     private bool          _jumpFired = false;
     private float         _jumpForce = 0f;
     private bool          _isRunning = false;
@@ -140,7 +139,7 @@ public class FpsController : Script
 
         _playerMaxSpeed = PlayerMoveSpeed * PlayerRunSpeedFactor;
         _controller.AutoGravity = true;
-        _camera = Actor.GetChild<VirtualCamera>();
+        _camera = Actor.GetChild<Camera>();
         PlayerLookSmooth = Mathf.Clamp(PlayerLookSmoothMax - PlayerLookSmooth, 10f, PlayerLookSmoothMax);
         PlayerWalkSmooth = Mathf.Clamp(PlayerWalkSmoothMax - PlayerWalkSmooth, 10f, PlayerWalkSmoothMax);
 #if FLAX_EDITOR

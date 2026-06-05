@@ -3,7 +3,6 @@
 #nullable enable
 using FlaxEngine;
 using Game.Player;
-using Gasimo.CineBlend;
 
 namespace Game.Physics;
 
@@ -52,7 +51,7 @@ public class BodyGrab : Script
 {
     /// <summary>Camera whose position and forward vector define the ray and hold target.</summary>
     [Header("References")]
-    public VirtualCamera Cam = null!;
+    public Camera Cam = null!;
 
     // >> Grab
 
