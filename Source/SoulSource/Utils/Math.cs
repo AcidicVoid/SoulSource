@@ -1,6 +1,6 @@
 ﻿using FlaxEngine;
 
-namespace Game.Game.Utils;
+namespace SoulSource.Utils;
 
 /// <summary>
 /// Math Script.

@@ -1,5 +1,5 @@
 ﻿using FlaxEngine;
-using Game.Physics;
+using SoulSource.Physics;
 using Quaternion = FlaxEngine.Quaternion;
 using Vector3 = FlaxEngine.Vector3;
 
@@ -7,12 +7,12 @@ using Vector3 = FlaxEngine.Vector3;
 using FlaxEditor;
 #endif
 
-namespace Game.Player;
+namespace SoulSource.Player;
 
 /// <summary>
 /// FpsController Script.
 /// </summary>
-[Category("Player")]
+[Category("SoulSource: Player")]
 [RequireActor(typeof(CharacterController))]
 public class FpsController : Script
 {

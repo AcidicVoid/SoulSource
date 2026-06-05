@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FlaxEngine;
 
-namespace Game.Utils;
+namespace SoulSource.Utils;
 
 /// <summary>
 /// Helper functions for easing transition

@@ -2,7 +2,7 @@
 
 using FlaxEngine;
 
-namespace Game;
+namespace SoulSource.Physics;
 
 /// <summary>
 /// PrefabSpawner Script.

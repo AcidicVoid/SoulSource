@@ -2,7 +2,7 @@
 
 using FlaxEngine;
 
-namespace Game.Physics;
+namespace SoulSource.Physics;
 
 /// <summary>
 /// Holds all per-grab state for a single picked-up rigid body.

@@ -2,9 +2,9 @@
 
 #nullable enable
 using FlaxEngine;
-using Game.Player;
+using SoulSource.Player;
 
-namespace Game.Physics;
+namespace SoulSource.Physics;
 
 /// <summary>
 /// Half-Life 2-style object grabbing mechanic.
@@ -47,6 +47,7 @@ namespace Game.Physics;
 /// public <see cref="TryGrab"/>, <see cref="Release"/>, and <see cref="Throw"/>
 /// methods.  This script owns no input polling.
 /// </summary>
+[Category("SoulSource: Physics")]
 public class BodyGrab : Script
 {
     /// <summary>Camera whose position and forward vector define the ray and hold target.</summary>
