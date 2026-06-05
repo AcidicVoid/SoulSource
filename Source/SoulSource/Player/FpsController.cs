@@ -28,11 +28,14 @@ public class FpsController : Script
     public InputEvent InputActionSecondary = new();
     public InputEvent InputCrouch          = new();
     public InputEvent InputNoClip          = new();
+    
+    [Header("Camera")] 
+    [Range(0f, 1f)] public float RelCameraHeight = 0.8f;
 
     [Header("Physics")] 
     public BodyGrab BodyGrab;
     [Range(1f,20f)]
-    public float PlayerMoveSpeed      = 7f;
+    public float PlayerMoveSpeed      = 5f;
     [Range(1.1f,2f)]
     public float PlayerRunSpeedFactor = Mathf.GoldenRatio;
     [Range(0.01f,2f)]
@@ -47,7 +50,7 @@ public class FpsController : Script
     public float PlayerWalkSmooth = 50f;
     
     public float PlayerJumpForce  = 20f;
-    public float PlayerWeightKg   = 80f;
+    public float PlayerWeight     = 60f;
     
     private CharacterController _controller;
     private Collider _collider;
@@ -85,17 +88,16 @@ public class FpsController : Script
         if (BodyGrab == null)
             return;
 
-        switch (InputActionPrimary.State)
+        if (InputActionPrimary.State == InputActionState.Press)
         {
-            case InputActionState.Press:
-                // Attempt to grab the object the player is looking at.
-                BodyGrab.TryGrab();
-                break;
+            // Attempt to grab the object the player is looking at.
+            BodyGrab.TryGrab();
+        }
 
-            case InputActionState.Release:
-                // Button released – drop the held object gently.
-                BodyGrab.Release();
-                break;
+        if (InputActionPrimary.State == InputActionState.Release)
+        {
+            // Button released – drop the held object gently.
+            BodyGrab.Release();
         }
     }
 
@@ -127,6 +129,11 @@ public class FpsController : Script
 
     private void HandleUseButton()
     {
+        if (InputUse.State == InputActionState.Press)
+        {
+            // InteractableManager.Instance?.RunInteraction(
+            //     InteractableManager.Instance?.GetFirstInteractableInRange());
+        }
     }
     
     /// <inheritdoc/>
@@ -140,6 +147,12 @@ public class FpsController : Script
         _playerMaxSpeed = PlayerMoveSpeed * PlayerRunSpeedFactor;
         _controller.AutoGravity = true;
         _camera = Actor.GetChild<Camera>();
+        
+        // Position the camera
+        var cameralocalPos = _camera.LocalPosition;
+        cameralocalPos.Y = (-_controller.Height) + (_controller.Height * RelCameraHeight);
+        _camera.LocalPosition = cameralocalPos;
+        
         PlayerLookSmooth = Mathf.Clamp(PlayerLookSmoothMax - PlayerLookSmooth, 10f, PlayerLookSmoothMax);
         PlayerWalkSmooth = Mathf.Clamp(PlayerWalkSmoothMax - PlayerWalkSmooth, 10f, PlayerWalkSmoothMax);
 #if FLAX_EDITOR
@@ -187,13 +200,15 @@ public class FpsController : Script
                 _jumpForce = PlayerJumpForce;
             }
             
-            _jumpForce = Mathf.Lerp(_jumpForce, _jumpForce - (PlayerWeightKg / 9.18f), Time.DeltaTime * 5f);
+            _jumpForce = Mathf.Lerp(_jumpForce, _jumpForce - (PlayerWeight / 9.18f), Time.DeltaTime * 5f);
             _jumpForce = Mathf.Clamp(_jumpForce,-_playerMaxSpeed * 2f, _playerMaxSpeed);
         }
         
         // Get linear movement
-        _linearMovement.X = Utils.Easing.EaseInOutCubic(_linearMovementInput.X) * PlayerMoveSpeed * _linearSpeedFactor;
-        _linearMovement.Z = Utils.Easing.EaseInOutCubicNeg(_linearMovementInput.Z) * PlayerMoveSpeed * _linearSpeedFactor;
+        float moveSignX = _linearMovementInput.X >= 0f ? 1f : -1f;
+        float moveSignZ = _linearMovementInput.Z >= 0f ? 1f : -1f;
+        _linearMovement.X = moveSignX * Mathf.Saturate(Utils.Easing.EaseInOutCubic(Mathf.Abs(_linearMovementInput.X)))    * PlayerMoveSpeed * _linearSpeedFactor;
+        _linearMovement.Z = moveSignZ * Mathf.Saturate(Utils.Easing.EaseInOutCubicNeg(Mathf.Abs(_linearMovementInput.Z))) * PlayerMoveSpeed * _linearSpeedFactor;
         _linearMovement.Y = _jumpForce;
 
         // Apply rotation to controller

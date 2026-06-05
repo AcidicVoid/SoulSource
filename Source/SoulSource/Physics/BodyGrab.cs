@@ -47,7 +47,7 @@ namespace SoulSource.Physics;
 /// public <see cref="TryGrab"/>, <see cref="Release"/>, and <see cref="Throw"/>
 /// methods.  This script owns no input polling.
 /// </summary>
-[Category("SoulSource: Physics")]
+
 public class BodyGrab : Script
 {
     /// <summary>Camera whose position and forward vector define the ray and hold target.</summary>
@@ -62,6 +62,8 @@ public class BodyGrab : Script
     /// </summary>
     [Header("Grab")]
     public float MaxDistance = 200f;
+    
+    public LayersMask LayersMask = new();
 
     /// <summary>
     /// Only <see cref="RigidBody"/> actors that carry this tag are grabbable.
@@ -139,6 +141,7 @@ public class BodyGrab : Script
     /// <returns>True if an object is now being held.</returns>
     public bool TryGrab()
     {
+        Debug.Log("SoulSource::BodyGrab::TryGrab()");
         if (_grabbed != null)
             return true;
 
@@ -147,18 +150,19 @@ public class BodyGrab : Script
             Cam.Direction,
             out RayCastHit hit,
             MaxDistance,
+            LayersMask,
             hitTriggers: false);
 
         if (!didHit)
             return false;
-
+        
         // Require a RigidBody - static or kinematic meshes cannot be moved.
         RigidBody? rb = hit.Collider.AttachedRigidBody;
         if (rb == null)
             return false;
 
         // Tag check: only grab objects explicitly marked as grabbable.
-        if (!rb.HasTag(GrabbableObjectTag))
+        if (!rb.Tags.HasTag(GrabbableObjectTag))
             return false;
 
         float holdDist = Mathf.Max(hit.Distance, MinHoldDistance);
@@ -177,6 +181,7 @@ public class BodyGrab : Script
     /// </summary>
     public void Release()
     {
+        Debug.Log("SoulSource::BodyGrab::Release()");
         _grabbed?.Restore();
         _grabbed = null;
     }
@@ -188,6 +193,7 @@ public class BodyGrab : Script
     /// </summary>
     public void Throw()
     {
+        Debug.Log("SoulSource::BodyGrab::Throw()");
         if (_grabbed == null)
             return;
 
@@ -207,7 +213,7 @@ public class BodyGrab : Script
     {
         if (Cam == null)
         {
-            Debug.LogWarning("[BodyGrab] VirtualCamera is not assigned.");
+            Debug.LogWarning("[BodyGrab] Camera is not assigned.");
             Enabled = false;
         }
     }
@@ -222,7 +228,6 @@ public class BodyGrab : Script
     public override void OnUpdate()
     {
         // Input is handled entirely by FpsController via TryGrab / Release / Throw.
-
         if (_grabbed == null)
             return;
 
@@ -233,6 +238,7 @@ public class BodyGrab : Script
         float breakDist = MaxDistance * 2.5f;
         if (distSq > breakDist * breakDist)
         {
+            Debug.Log("SoulSource::BodyGrab::OnUpdate(): distSq > breakDist * breakDist is true - releasing");
             Release();
             return;
         }
@@ -281,11 +287,13 @@ public class BodyGrab : Script
                 Cam.Position,
                 camToGrab / camToGrabDist,    // normalised direction
                 out RayCastHit blockHit,
-                camToGrabDist * 0.95f,        // slightly short so the held surface itself doesn't trigger
+                camToGrabDist * 0.95f,     // slightly short so the held surface itself doesn't trigger
+                LayersMask,
                 hitTriggers: false);
 
             if (blocked && blockHit.Collider.AttachedRigidBody != body)
             {
+                Debug.Log("SoulSource::BodyGrab::OnUpdate(): blocked && blockHit.Collider.AttachedRigidBody != body true - releasing");
                 Release();
                 return;
             }
